@@ -6,15 +6,16 @@ error_reporting(E_ALL);
 
 include 'db_config.php';
 
-// Create a new testimonial record in the database.
+// Create a new record in the database.
 
 if(isset($_POST["user_id"]))
 {
+
   $user_id       = $_POST["user_id"];
-  $strengths     = $_POST["s"];
-  $weaknesses    = $_POST["w"];
-  $opportunities = $_POST["o"];
-  $threats       = $_POST["t"];
+  $strengths     = implode(", ", $_POST["strengths"]);
+  $weaknesses    = implode(", ", $_POST["weaknesses"]);
+  $opportunities = implode(", ", $_POST["opportunities"]);
+  $threats       = implode(", ", $_POST["threats"]);
 
   // https://www.w3schools.com/php/php_mysql_prepared_statements.asp
   // prepare sql and bind parameters
@@ -23,9 +24,9 @@ if(isset($_POST["user_id"]))
 
   $stmt->bindParam(':user_id', $user_id);
   $stmt->bindParam(':strengths', $strengths);
-  $stmt->bindParam(':testimony', $testimony);
-  $stmt->bindParam(':communityID', $communityID);
-  $stmt->bindParam(':active', $active);
+  $stmt->bindParam(':weaknesses', $weaknesses);
+  $stmt->bindParam(':opportunities', $opportunities);
+  $stmt->bindParam(':threats', $threats);
 
   // insert a row
   $status = $stmt->execute();

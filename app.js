@@ -2,11 +2,13 @@ $(document).ready(function(){
 
 
   // https://api.jqueryui.com/sortable
-  $( "#sortable, #sortable2" ).sortable({
-    // placeholder: "ui-state-highlight",
-    // // TODO: ON HOVER CURSOR NOT RIGHT
+  $( "#sortable, #sortable2, #sortable3, #sortable4" ).sortable({
+    // TODO: ON HOVER CURSOR NOT RIGHT
     cursor: "move",
     update: function(event, ui) {
+
+      // Instead of calling these on update, they're called on form submit
+
       // getStrengths();
       // getWeaknesses();
       // getOpportunities();
@@ -16,69 +18,98 @@ $(document).ready(function(){
   $( "#sortable" ).disableSelection();
 
 
+  var strengths = [];
   function getStrengths() {
     $.each($('#sortable').find('li, input'), function() {
       if ($(this).val()) {
-        console.log($(this).val());
+        strengths.push($(this).val());
       } else if ($(this).text()) {
-        console.log($(this).text());
+        strengths.push($(this).text());
       }
     });
+    return strengths;
   }
 
 
+  var weaknesses = [];
   function getWeaknesses() {
     $.each($('#sortable2').find('li, input'), function() {
       if ($(this).val()) {
-        console.log($(this).val());
+        weaknesses.push($(this).val());
       } else if ($(this).text()) {
-        console.log($(this).text());
+        weaknesses.push($(this).text());
       }
     });
+    return weaknesses;
   }
 
 
+  var opportunities = [];
   function getOpportunities() {
-
+    $.each($('#sortable3').find('li, input'), function() {
+      if ($(this).val()) {
+        opportunities.push($(this).val());
+      } else if ($(this).text()) {
+        opportunities.push($(this).text());
+      }
+    });
+    return opportunities;
   }
 
 
+  var threats = [];
   function getThreats() {
-
+    $.each($('#sortable4').find('li, input'), function() {
+      if ($(this).val()) {
+        threats.push($(this).val());
+      } else if ($(this).text()) {
+        threats.push($(this).text());
+      }
+    });
+    return threats;
   }
+
 
   $("#surveyForm").submit(function(e) {
     e.preventDefault();
 
-    // TODO: CREATE A CUSTOM USER ID AND UPDATE SUBS ON THAT
+    // Unique user ID ( milliseconds since Jan 1st 1970 )
+    // TODO: set a cookie instead so their id stays the same
+    var user_id = Date.now();
 
-    // TODO: GET ALL ZE STUFF TO ZEND
-    // PUT IT ALL IN ARRAZE OR ZUMTHING
+    // Call the functions that get the order of values in the SWOT
     getStrengths();
     getWeaknesses();
     getOpportunities();
     getThreats();
 
+    console.log(user_id +' '+  strengths + weaknesses + opportunities + threats);
+
     $.ajax({
       type: "POST",
-      url: "./php/edit_col.php",
+      url: "./php/send.php",
       data:{user_id:user_id,strengths:strengths,weaknesses:weaknesses,opportunities:opportunities,threats:threats},
       success: function(data) {
 
         if (data === "success") {
           console.log('success');
 
-          //  show em a modal or something,
-          // then redirect them to avameremarketing.com BAM
+          // Send submittor to the thank you page.
+          window.location.href = "thank-you.php";
+
+          // // clear the arrays
+          // var strengths = [];
+          // var weaknesses = [];
+          // var opportunities = [];
+          // var threats = [];
 
         } else if (data === "failure") {
           alert('Call the dev, things are broken');
         }
 
       }
-    }).done(function(){
-      // in case i want to do something here
     });
-  })
+
+  });
 
 });
